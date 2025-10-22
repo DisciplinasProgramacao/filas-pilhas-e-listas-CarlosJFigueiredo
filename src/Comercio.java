@@ -49,6 +49,8 @@ public class Comercio {
         System.out.println("3 - Cadastrar novo produto");
         System.out.println("4 - Iniciar novo pedido");
         System.out.println("5 - Fechar pedido");
+        System.out.println("6 - Listar pedidos finalizados");
+        System.out.println("7 - Localizar e excluir pedido finalizado (por código)");
         System.out.println("0 - Sair");
         System.out.print("Digite sua opção: ");
         return Integer.parseInt(teclado.nextLine());
@@ -214,9 +216,48 @@ public class Comercio {
      */
     public static void finalizarPedido(Pedido pedido) {
         if(pedido != null) {
+            // atribui código sequencial ao pedido no momento da finalização
+            pedido.atribuirCodigoSequencial();
             pedidosCadastrados.inserir(pedido, pedidosCadastrados.getTamanho());
+            System.out.println("Pedido finalizado e cadastrado com código: " + pedido.getCodigo());
+            System.out.println(pedido.resumo());
         } else {
             System.out.println("Pedido vazio.");
+        }
+    }
+
+    /** Lista os pedidos finalizados (resumo) */
+    public static void listarPedidos() {
+        cabecalho();
+        System.out.println("PEDIDOS FINALIZADOS:");
+        if (pedidosCadastrados.vazia()) {
+            System.out.println("Nenhum pedido finalizado.");
+            return;
+        }
+        for (int i = 0; i < pedidosCadastrados.getTamanho(); i++) {
+            Pedido p = pedidosCadastrados.obter(i);
+            System.out.println(p.resumo());
+        }
+    }
+
+    /** Localiza e exclui um pedido finalizado pelo seu código */
+    public static void localizarEExcluirPedidoPorCodigo() {
+        cabecalho();
+        System.out.print("Digite o código do pedido a ser excluído: ");
+        int codigoBuscado = Integer.parseInt(teclado.nextLine());
+        int encontrado = -1;
+        for (int i = 0; i < pedidosCadastrados.getTamanho(); i++) {
+            Pedido p = pedidosCadastrados.obter(i);
+            if (p.getCodigo() == codigoBuscado) {
+                encontrado = i;
+                break;
+            }
+        }
+        if (encontrado >= 0) {
+            Pedido removido = pedidosCadastrados.remover(encontrado);
+            System.out.println("Pedido excluído: " + removido.resumo());
+        } else {
+            System.out.println("Pedido com código " + codigoBuscado + " não encontrado.");
         }
     }
 
@@ -260,6 +301,8 @@ public class Comercio {
                 case 3 -> cadastrarProduto();
                 case 4 -> pedido = iniciarPedido();
                 case 5 -> finalizarPedido(pedido);
+                case 6 -> listarPedidos();
+                case 7 -> localizarEExcluirPedidoPorCodigo();
             }
             pausa();
         }while(opcao != 0);       

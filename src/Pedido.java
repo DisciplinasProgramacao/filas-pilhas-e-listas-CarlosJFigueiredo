@@ -19,6 +19,12 @@ public class Pedido {
 	/** Armazena a data de criação do pedido */
 	private LocalDate dataPedido;
 
+	/** Código sequencial único do pedido (atribuído ao finalizar). Valor 0 indica 'não finalizado/ainda sem código' */
+	private int codigo;
+
+	/** Contador estático para gerar códigos sequenciais */
+	private static int contadorCodigo = 1;
+
 	/** Construtor do Pedido. Deve criar o vetor e armazenar a data atual do sistema na data do pedido */
 	public Pedido() {
 		produtos = new Produto[MAX_PRODUTOS];
@@ -61,9 +67,15 @@ public class Pedido {
      */
 	public String toString() {
 		DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		StringBuilder retorno = new StringBuilder("Pedido na data "+formato.format(dataPedido)+"\n");
+		StringBuilder retorno = new StringBuilder();
+		if (codigo > 0) {
+			retorno.append("Pedido #" + codigo + " na data " + formato.format(dataPedido) + "\n");
+		} else {
+			retorno.append("Pedido na data " + formato.format(dataPedido) + "\n");
+		}
 		for (int i = 0; i < quantProdutos; i++) {
-			retorno.append(produtos[i].toString()+"\n");
+			retorno.append(produtos[i].toString());
+			retorno.append("\n");
 		}
 		retorno.append(String.format("Valor a pagar: R$ %.2f", valorFinal()));
 		return retorno.toString();
@@ -78,11 +90,26 @@ public class Pedido {
 	public String resumo() {
 		//TODO
 		//"Pedido com XX produtos em DD/MM/AAAA, valor total de R$ XX,XX"
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");   
-		String valorFinalFormatado = String.format("%.2f",this.valorFinal()).replace(",", ".");     
-        String dados = "Pedido com " + quantProdutos + " em " + formato.format(dataPedido) + ", valor total de R$ " + valorFinalFormatado;
-        return dados;
+		DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String valorFinalFormatado = String.format("%.2f", this.valorFinal());
+		if (codigo > 0) {
+			return "Pedido #" + codigo + " com " + quantProdutos + " em " + formato.format(dataPedido) + ", valor total de R$ " + valorFinalFormatado;
+		}
+		return "Pedido com " + quantProdutos + " em " + formato.format(dataPedido) + ", valor total de R$ " + valorFinalFormatado;
 
+	}
+
+	/**
+	 * Atribui um código sequencial ao pedido. Deve ser chamado apenas quando o pedido for finalizado.
+	 */
+	public void atribuirCodigoSequencial() {
+		if (this.codigo == 0) {
+			this.codigo = contadorCodigo++;
+		}
+	}
+
+	public int getCodigo() {
+		return this.codigo;
 	}
 
 }
