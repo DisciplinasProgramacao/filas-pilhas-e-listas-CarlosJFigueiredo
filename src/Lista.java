@@ -72,8 +72,67 @@ public class Lista<E> {
 				
 		return (celulaRemovida.getItem());	
 	}
-
-	public static void main(String[] args) {
-		Lista<Integer> l = new Lista<>();
+	
+	/**
+	 * Retorna o tamanho da lista
+	 * @return tamanho da lista
+	 */
+	public int getTamanho() {
+		return this.tamanho;
+	}
+	
+	/**
+	 * Obtém o item em uma determinada posição
+	 * @param posicao posição do item
+	 * @return item na posição especificada
+	 */
+	public E obter(int posicao) {
+		if ((posicao < 0) || (posicao >= this.tamanho))
+			throw new IndexOutOfBoundsException("Posição inválida!");
+		
+		Celula<E> atual = this.primeiro.getProximo();
+		for (int i = 0; i < posicao; i++)
+			atual = atual.getProximo();
+		
+		return atual.getItem();
+	}
+	
+	/**
+	 * Verifica se a lista contém um determinado item
+	 * @param item item a ser verificado
+	 * @return true se o item existe na lista, false caso contrário
+	 */
+	public boolean contem(E item) {
+		Celula<E> atual = this.primeiro.getProximo();
+		
+		while (atual != null) {
+			if (atual.getItem().equals(item))
+				return true;
+			atual = atual.getProximo();
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Imprime o conteúdo da lista
+	 */
+	public void imprimir() {
+		if (vazia()) {
+			System.out.println("Lista vazia!");
+			return;
+		}
+		
+		System.out.print("Lista: [");
+		Celula<E> atual = this.primeiro.getProximo();
+		
+		while (atual != null) {
+			System.out.print(atual.getItem());
+			if (atual.getProximo() != null)
+				System.out.print(", ");
+			atual = atual.getProximo();
+		}
+		
+		System.out.println("]");
 	}
 }
