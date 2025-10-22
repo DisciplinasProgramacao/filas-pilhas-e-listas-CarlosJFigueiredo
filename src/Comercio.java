@@ -23,14 +23,8 @@ public class Comercio {
     /** Quantidade produtos cadastrados atualmente no vetor */
     static int quantosProdutos;
 
-    /** Quantidade máxima de pedidos que podem ser armazenados no vetor */
-    static final int MAX_PEDIDOS = 10;
-    
-    /** Vetor de pedidos cadastrados */
-    static Fila<Pedido> pedidosCadastrados;
-    
-    /** Quantidade de pedidos cadastrados atualmente no vetor */
-    static int quantPedidos;
+    /** Lista flexível de pedidos cadastrados */
+    static Lista<Pedido> pedidosCadastrados;
     
     /** Gera um efeito de pausa na CLI. Espera por um enter para continuar */
     static void pausa(){
@@ -215,14 +209,12 @@ public class Comercio {
     }
 
     /**
-     * Finaliza um pedido, momento no qual ele deve ser armazenado em um vetor de pedidos ou outra estrutura de dados
-     * desenvolvida em nossas aulas.
+     * Finaliza um pedido, momento no qual ele deve ser armazenado na lista de pedidos.
      * @param pedido O pedido que deve ser finalizado.
      */
     public static void finalizarPedido(Pedido pedido) {
         if(pedido != null) {
-            pedidosCadastrados.enfileirar(pedido);
-            quantPedidos++;
+            pedidosCadastrados.inserir(pedido, pedidosCadastrados.getTamanho());
         } else {
             System.out.println("Pedido vazio.");
         }
@@ -236,10 +228,11 @@ public class Comercio {
     public static void salvarPedidos(String nomeArquivo) {
         try {
             FileWriter arquivoSaida = new FileWriter(nomeArquivo, Charset.forName("UTF-8"));
-            arquivoSaida.append(quantPedidos + "\n");
+            arquivoSaida.append(pedidosCadastrados.getTamanho() + "\n");
         
-            while(!pedidosCadastrados.vazia())
-                arquivoSaida.append(pedidosCadastrados.desenfileirar().resumo()+"\n");
+            for (int i = 0; i < pedidosCadastrados.getTamanho(); i++) {
+                arquivoSaida.append(pedidosCadastrados.obter(i).resumo()+"\n");
+            }
             
             arquivoSaida.close();    
             System.out.println("Arquivo "+nomeArquivo+" salvo.");
@@ -254,7 +247,7 @@ public class Comercio {
         nomeArquivoDados = "produtos.txt";
         String nomeArquivoPedidos = "dadosPedidos.csv";
         produtosCadastrados = lerProdutos(nomeArquivoDados);
-        pedidosCadastrados = new Fila<>();
+        pedidosCadastrados = new Lista<>();
         Pedido pedido = null;
         
         int opcao = -1;
