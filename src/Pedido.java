@@ -3,18 +3,12 @@ import java.time.format.DateTimeFormatter;
 
 public class Pedido {
 
-	/** Quantidade máxima de produtos de um pedido */
-	private static final int MAX_PRODUTOS = 10;
+	/** Lista para armazenar os produtos do pedido */
+	private Lista<Produto> produtos;
 	
-	/** Vetor para armazenar os produtos do pedido */
-	private Produto[] produtos;
-	
-	public Produto[] getProdutos() {
+	public Lista<Produto> getProdutos() {
 		return produtos;
 	}
-
-	/** Armazena a quantidade total de produtos no pedido neste momento */
-	private int quantProdutos;
 
 	/** Armazena a data de criação do pedido */
 	private LocalDate dataPedido;
@@ -25,11 +19,10 @@ public class Pedido {
 	/** Contador estático para gerar códigos sequenciais */
 	private static int contadorCodigo = 1;
 
-	/** Construtor do Pedido. Deve criar o vetor e armazenar a data atual do sistema na data do pedido */
+	/** Construtor do Pedido. Deve criar a lista e armazenar a data atual do sistema na data do pedido */
 	public Pedido() {
-		produtos = new Produto[MAX_PRODUTOS];
+		produtos = new Lista<Produto>();
 		this.dataPedido = LocalDate.now();
-		this.quantProdutos = 0;
 	}
 
 	
@@ -40,12 +33,12 @@ public class Pedido {
      * @return A quantidade de produtos no pedido após a inclusão
      */
 	public int incluirProduto(Produto novo) {
-		if(quantProdutos < MAX_PRODUTOS && novo != null) {
-			produtos[quantProdutos++] = novo;
+		if(novo != null) {
+			produtos.inserir(novo, produtos.getTamanho());
 		} else {
-			System.out.println("Produto nulo ou excedeu a quantidade de produtos permitida.");
+			System.out.println("Produto nulo não pode ser adicionado.");
 		}
-		return quantProdutos;
+		return produtos.getTamanho();
 	}
 
     /**
@@ -54,8 +47,8 @@ public class Pedido {
      */
 	public double valorFinal() {
 		double total = 0d;
-		for (int i = 0; i < quantProdutos; i++) {
-			total += produtos[i].valorDeVenda();
+		for (int i = 0; i < produtos.getTamanho(); i++) {
+			total += produtos.obter(i).valorDeVenda();
 		}
 		return total;
 	}
@@ -73,8 +66,8 @@ public class Pedido {
 		} else {
 			retorno.append("Pedido na data " + formato.format(dataPedido) + "\n");
 		}
-		for (int i = 0; i < quantProdutos; i++) {
-			retorno.append(produtos[i].toString());
+		for (int i = 0; i < produtos.getTamanho(); i++) {
+			retorno.append(produtos.obter(i).toString());
 			retorno.append("\n");
 		}
 		retorno.append(String.format("Valor a pagar: R$ %.2f", valorFinal()));
@@ -88,14 +81,12 @@ public class Pedido {
 	 * @return Uma string como especificada acima
 	 */
 	public String resumo() {
-		//TODO
-		//"Pedido com XX produtos em DD/MM/AAAA, valor total de R$ XX,XX"
 		DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		String valorFinalFormatado = String.format("%.2f", this.valorFinal());
 		if (codigo > 0) {
-			return "Pedido #" + codigo + " com " + quantProdutos + " em " + formato.format(dataPedido) + ", valor total de R$ " + valorFinalFormatado;
+			return "Pedido #" + codigo + " com " + produtos.getTamanho() + " produtos em " + formato.format(dataPedido) + ", valor total de R$ " + valorFinalFormatado;
 		}
-		return "Pedido com " + quantProdutos + " em " + formato.format(dataPedido) + ", valor total de R$ " + valorFinalFormatado;
+		return "Pedido com " + produtos.getTamanho() + " produtos em " + formato.format(dataPedido) + ", valor total de R$ " + valorFinalFormatado;
 
 	}
 

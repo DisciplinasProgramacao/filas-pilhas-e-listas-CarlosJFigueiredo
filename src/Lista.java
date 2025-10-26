@@ -135,4 +135,27 @@ public class Lista<E> {
 		
 		System.out.println("]");
 	}
+	
+	/**
+	 * Conta quantas repetições de elementos atendem a uma condição específica
+	 * @param condicional Predicado que define a condição para contar elementos
+	 * @return Quantidade de elementos que atendem à condição (0 se lista vazia)
+	 */
+	public int contarRepeticoes(java.util.function.Predicate<E> condicional) {
+		if (vazia()) {
+			return 0;
+		}
+		
+		int contador = 0;
+		Celula<E> atual = this.primeiro.getProximo();
+		
+		while (atual != null) {
+			if (condicional.test(atual.getItem())) {
+				contador++;
+			}
+			atual = atual.getProximo();
+		}
+		
+		return contador;
+	}
 }

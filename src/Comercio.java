@@ -51,6 +51,7 @@ public class Comercio {
         System.out.println("5 - Fechar pedido");
         System.out.println("6 - Listar pedidos finalizados");
         System.out.println("7 - Localizar e excluir pedido finalizado (por código)");
+        System.out.println("8 - Contar repetições de produto em pedido");
         System.out.println("0 - Sair");
         System.out.print("Digite sua opção: ");
         return Integer.parseInt(teclado.nextLine());
@@ -261,6 +262,61 @@ public class Comercio {
         }
     }
 
+    /**
+     * Conta as repetições de um produto específico em um pedido.
+     * Permite ao usuário selecionar um pedido finalizado e um produto,
+     * e exibe quantas vezes esse produto aparece no pedido.
+     */
+    public static void repeticoesDeProdutoNoPedido() {
+        cabecalho();
+        System.out.println("CONTAGEM DE PRODUTOS EM PEDIDO");
+        
+        if (pedidosCadastrados.vazia()) {
+            System.out.println("Nenhum pedido finalizado cadastrado.");
+            return;
+        }
+        
+        // Listar pedidos disponíveis
+        System.out.println("\nPedidos finalizados:");
+        for (int i = 0; i < pedidosCadastrados.getTamanho(); i++) {
+            Pedido p = pedidosCadastrados.obter(i);
+            System.out.println((i+1) + " - " + p.resumo());
+        }
+        
+        // Selecionar pedido
+        System.out.print("\nDigite o número do pedido: ");
+        int numeroPedido = Integer.parseInt(teclado.nextLine()) - 1;
+        
+        if (numeroPedido < 0 || numeroPedido >= pedidosCadastrados.getTamanho()) {
+            System.out.println("Pedido inválido.");
+            return;
+        }
+        
+        Pedido pedidoSelecionado = pedidosCadastrados.obter(numeroPedido);
+        
+        if (pedidoSelecionado.getProdutos().vazia()) {
+            System.out.println("O pedido selecionado não possui produtos.");
+            return;
+        }
+        
+        // Solicitar descrição do produto
+        System.out.print("Digite o nome do produto a contar: ");
+        String descricaoProduto = teclado.nextLine();
+        
+        // Criar um produto de busca
+        Produto produtoBusca = new ProdutoNaoPerecivel(descricaoProduto, 1);
+        
+        // Contar repetições usando o método contarRepeticoes da Lista
+        int quantidade = pedidoSelecionado.getProdutos().contarRepeticoes(
+            produto -> produto.equals(produtoBusca)
+        );
+        
+        System.out.println("\nResultado:");
+        System.out.println("Pedido: " + pedidoSelecionado.resumo());
+        System.out.println("Produto procurado: " + descricaoProduto);
+        System.out.println("Quantidade de repetições: " + quantidade);
+    }
+
      /**
      * Salva os dados dos pedidos cadastrados no arquivo csv informado. Sobrescreve todo o conteúdo do arquivo, se ele já existir.
      * São gravados no arquivo-texto os resumos dos pedidos, um em cada linha do arquivo.
@@ -303,6 +359,7 @@ public class Comercio {
                 case 5 -> finalizarPedido(pedido);
                 case 6 -> listarPedidos();
                 case 7 -> localizarEExcluirPedidoPorCodigo();
+                case 8 -> repeticoesDeProdutoNoPedido();
             }
             pausa();
         }while(opcao != 0);       
